@@ -1,0 +1,221 @@
+admin:
+  access_log_path: /dev/stdout
+  address:
+    socket_address: { address: 0.0.0.0, port_value: 9901 }
+
+static_resources:
+  listeners:
+  - address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 443
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        config:
+          codec_type: auto
+          stat_prefix: ingress_http
+          use_remote_address: true
+          access_log:
+          - name: envoy.file_access_log
+            config:
+              path: "/dev/stdout"
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: local_service_org1
+              domains: ["org1.dev-verishare.ml"]
+              routes:
+
+              - match: { prefix: "/auth" }
+                route: { cluster: keycloak-0 }
+
+              - match: { prefix: "/swagger-api" }
+                route: { cluster: swagger-0 }
+
+              - match: { prefix: "/api" }
+                route: { cluster: backend-0 }
+
+              - match: { prefix: "/session" }
+                route: { cluster: backend-0 }
+
+              - match: { prefix: "/" }
+                route: { cluster: react-0 }
+
+              - match: { prefix: "/static" }
+                route: { cluster: react-0 }
+
+            - name: local_service_org2
+              domains: ["org2.dev-verishare.ml"]
+              routes:
+
+              - match: { prefix: "/auth" }
+                route: { cluster: keycloak-1 }
+
+              - match: { prefix: "/swagger-api" }
+                route: { cluster: swagger-1 }
+
+              - match: { prefix: "/api" }
+                route: { cluster: backend-1 }
+
+              - match: { prefix: "/session" }
+                route: { cluster: backend-1 }
+
+              - match: { prefix: "/" }
+                route: { cluster: react-1 }
+
+              - match: { prefix: "/static" }
+                route: { cluster: react-1 }
+
+            - name: local_service_org3
+              domains: ["org3.dev-verishare.ml"]
+              routes:
+
+              - match: { prefix: "/auth" }
+                route: { cluster: keycloak-2 }
+
+              - match: { prefix: "/swagger-api" }
+                route: { cluster: swagger-2 }
+
+              - match: { prefix: "/api" }
+                route: { cluster: backend-2 }
+
+              - match: { prefix: "/session" }
+                route: { cluster: backend-2 }
+
+              - match: { prefix: "/" }
+                route: { cluster: react-2 }
+
+              - match: { prefix: "/static" }
+                route: { cluster: react-2 }
+
+          http_filters:
+          - name: envoy.router
+      tls_context:
+        common_tls_context:
+          tls_certificates:
+            - certificate_chain:
+                filename: "/etc/envoy.crt"
+              private_key:
+                filename: "/etc/envoy.key"
+
+  clusters:
+  - name: keycloak-0
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: keycloak-0, port_value: 8080 }}]
+
+  - name: backend-0
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: backend-0, port_value: 3000 }}]
+
+  - name: react-0
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: react-0, port_value: 3000 }}]
+
+  - name: mailhog-0
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: mailhog-0, port_value: 8025 }}]
+
+  - name: swagger-0
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: swagger-0, port_value: 8080 }}]
+
+  - name: keycloak-1
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: keycloak-1, port_value: 8080 }}]
+
+  - name: backend-1
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: backend-1, port_value: 3000 }}]
+
+  - name: react-1
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: react-1, port_value: 3000 }}]
+
+  - name: mailhog-1
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: mailhog-1, port_value: 8025 }}]
+
+  - name: swagger-1
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: swagger-1, port_value: 8080 }}]
+
+  - name: keycloak-2
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: keycloak-2, port_value: 8080 }}]
+
+  - name: backend-2
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: backend-2, port_value: 3000 }}]
+
+  - name: react-2
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: react-2, port_value: 3000 }}]
+
+  - name: mailhog-2
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: mailhog-2, port_value: 8025 }}]
+
+  - name: swagger-2
+    connect_timeout: 0.25s
+    type: LOGICAL_DNS
+    # Comment out the following line to test on v6 networks
+    dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    hosts: [{ socket_address: { address: swagger-2, port_value: 8080 }}]

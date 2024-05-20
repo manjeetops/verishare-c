@@ -1,0 +1,11 @@
+.MuiPaper-root.signup-container{
+  padding: 45px;
+  border-radius: 12px;
+}
+
+button.MuiButtonBase-root.register-button{ 
+  width: 50%;
+  border-radius: 8px;
+  background-color: #3F4044;
+  color: whitesmoke;
+}

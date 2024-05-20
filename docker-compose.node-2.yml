@@ -1,0 +1,119 @@
+version: "3.5"
+
+volumes:
+  postgres-data-2:
+  redis-data-2:
+  spring-node-c-data:
+
+services:
+
+  # =================== Backend ===================
+  postgres-2:
+    image: postgres
+    env_file:
+      - ./envs/node-2/postgres.env
+    volumes:
+      - postgres-data-2:/var/lib/postgresql/data
+
+  redis-2:
+    image: redis
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis-data-2:/data
+    restart: always
+
+  keycloak-2:
+    image: jboss/keycloak
+    env_file:
+      - ./envs/node-2/keycloak.env
+      - ./envs/node-2/postgres.env
+    depends_on:
+      - postgres-2
+    ports:
+      - 8082:8080
+
+  backend-2:
+    build:
+      context: "./backend"
+    command:
+      - make
+      - dev
+    env_file:
+      - ./envs/node-2/backend.env
+      - ./envs/node-2/postgres.env
+    ports:
+      - 3002:3000
+    volumes:
+      - /opt/node_modules
+      - ./backend:/opt
+
+  react-2:
+    build:
+      context: ./react
+    command: ["npm", "start"]
+    ports:
+      - "4002:3000"
+    volumes:
+      - /app/node_modules
+      - ./react:/app
+
+
+  mailhog-2:
+    image: mailhog/mailhog
+    expose:
+      - 1025
+      - 8025
+    ports:
+      - "1027:1025"
+      - "8027:8025"
+    entrypoint: ["/bin/sh", "-c", "MailHog &>/dev/null"]
+
+  swagger-2:
+    build:
+      context: ./swagger-api/
+    ports:
+      - '8885:8080'
+    volumes:
+      - ./swagger-api/swagger:/swagger-api:delegated
+
+  # ========================= xx ==========================
+
+  #=========================Corda==========================
+  corda-node-2:
+    ports:
+      - "10039:10039"
+      - "10040:10040"
+      - "10041:10041"
+      - "2226:2226"
+    image: corda/corda-zulu-java1.8-4.3:latest
+    container_name: partyc
+    volumes:
+      - ./corda/build/nodes/PartyC/node.conf:/etc/corda/node.conf
+      - ./corda/build/nodes/PartyC/cordapps/:/opt/corda/cordapps/
+      - ./corda/build/nodes/PartyC/certificates/:/opt/corda/certificates/
+      - ./corda/build/nodes/PartyC/network-parameters:/opt/corda/network-parameters
+      - ./corda/build/nodes/PartyC/logs/:/opt/corda/logs/
+
+  spring-node-2:
+    ports:
+      - "8434:8434"
+    container_name: spring-node-c
+    depends_on:
+      - corda-node-2
+    restart: always
+    build:
+      context: corda/clients
+      dockerfile: Dockerfile
+    image: spring-boot-docker:v1.1
+    env_file:
+      - ./envs/node-2/corda.env
+    command: sh -c "sh entrypoint.sh"
+    volumes:
+      - spring-node-c-data:/tmp
+
+    #========================= xx ======================
+
+networks:
+  default:
+    external:
+      name: deqode

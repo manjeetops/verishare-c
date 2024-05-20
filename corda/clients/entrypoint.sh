@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+sleep 40s && java -jar app.jar --server.port=${SPRING_PORT} --server.host=${SPRING_HOST} --config.rpc.host=${RPC_HOST} --config.rpc.port=${RPC_PORT} --config.rpc.username=${RPC_USERNAME} --config.rpc.password=${RPC_PASSWORD}

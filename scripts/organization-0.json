@@ -1,0 +1,15 @@
+{
+  "keycloakUsername": "admin",
+  "keycloakPassword": "admin@123",
+  "organizationUniqueName": "deqode",
+  "organizationBusinessName": "Deqode Labs",
+  "baseUrl": "https://org1.dev-verishare.ml",
+  "user": {
+    "email": "admin@deqode.com",
+    "firstName": "admin",
+    "lastName": "deqode",
+    "password": "string"
+  },
+  "description": "Blockchain providers",
+  "databaseName": "deqode"
+}

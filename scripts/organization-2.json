@@ -1,0 +1,15 @@
+{
+  "keycloakUsername": "admin",
+  "keycloakPassword": "admin@123",
+  "organizationUniqueName": "grepruby",
+  "organizationBusinessName": "Grepruby",
+  "baseUrl": "https://org3.dev-verishare.ml",
+  "user": {
+    "email": "admin@grepruby.com",
+    "firstName": "admin",
+    "lastName": "grepruby",
+    "password": "string"
+  },
+  "description": "Blockchain providers",
+  "databaseName": "grepruby"
+}

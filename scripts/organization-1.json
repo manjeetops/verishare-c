@@ -1,0 +1,15 @@
+{
+  "keycloakUsername": "admin",
+  "keycloakPassword": "admin@123",
+  "organizationUniqueName": "techracers",
+  "organizationBusinessName": "Techracers",
+  "baseUrl": "https://org2.dev-verishare.ml",
+  "user": {
+    "email": "admin@techracers.com",
+    "firstName": "admin",
+    "lastName": "techracers",
+    "password": "string"
+  },
+  "description": "Blockchain providers",
+  "databaseName": "techracers"
+}
